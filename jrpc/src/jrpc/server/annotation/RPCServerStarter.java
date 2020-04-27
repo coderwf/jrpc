@@ -6,15 +6,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-
 /*
- * 作用于类上
- * 
+ * 标记该类为RPC服务的启动类 
  */
+
 
 @Documented
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface RPCService {
-    public String name() default "";
+public @interface RPCServerStarter {
+    String name() default ""; //服务名
 }
