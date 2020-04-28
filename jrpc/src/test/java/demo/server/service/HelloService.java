@@ -1,4 +1,4 @@
-package com.github.server.service;
+package demo.server.service;
 
 import com.github.jrpc.server.annotation.RPCMapping;
 import com.github.jrpc.server.annotation.RPCService;
