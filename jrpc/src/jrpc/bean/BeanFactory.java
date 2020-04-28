@@ -53,7 +53,7 @@ public class BeanFactory {
     public static Object getBean(String beanName) throws InstantiationException, IllegalAccessException {
         BeanInfo beanInfo = beansMap.get(beanName);
         if(beanInfo == null)
-        	throw new RuntimeException(String.format("Can not find Bean %s", beanName));
+            return null;
         
         if(beanInfo.scope.equals(Prototype))
     		return beanInfo.clazz.newInstance();

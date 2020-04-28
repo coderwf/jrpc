@@ -4,14 +4,14 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 
 import jrpc.bean.BeanFactory;
-import jrpc.bean.Handler;
+import jrpc.bean.HandlerInfo;
 import jrpc.server.annotation.RPCMapping;
 import jrpc.server.annotation.RPCService;
 
 public class Dispatcher {
     private static Dispatcher dispatcher = new Dispatcher();
     
-    private HashMap<String, Handler> mappings = new HashMap<String, Handler>(200);
+    private HashMap<String, HandlerInfo> mappings = new HashMap<String, HandlerInfo>(200);
     
     private Dispatcher() {};
     
@@ -46,19 +46,19 @@ public class Dispatcher {
     		else
     			mappingName = rpcMapping.mapping();
     		
-    		mappings.put(String.format("%s.%s", serviceName, mappingName), new Handler(clazz.getSimpleName(), method));
+    		mappings.put(String.format("%s.%s", serviceName, mappingName), new HandlerInfo(clazz.getSimpleName(), method));
     		
     	}//for
     	
     	try {
 			BeanFactory.registerBean(clazz.getSimpleName(), clazz, BeanFactory.Singleton);
 		} catch (InstantiationException | IllegalAccessException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
     	
     }//addMapping
     
-    public Handler getHandler(String serviceName) {
+    public HandlerInfo getHandler(String serviceName) {
     	return mappings.get(serviceName);
     }
     

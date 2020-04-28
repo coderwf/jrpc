@@ -2,13 +2,13 @@ package jrpc.bean;
 
 import java.lang.reflect.Method;
 
-public class Handler {
+public class HandlerInfo {
     private String obj;
     private Method method;
     
-    public Handler() {};
+    public HandlerInfo() {};
     
-    public Handler(String obj, Method method) {
+    public HandlerInfo(String obj, Method method) {
     	this.obj = obj;
     	this.method = method;
     }

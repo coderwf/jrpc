@@ -1,14 +1,16 @@
 package jrpc.server.application;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 
 import jrpc.bean.BeanFactory;
-import jrpc.bean.Handler;
+import jrpc.bean.HandlerInfo;
 import jrpc.server.annotation.RPCServerStarter;
 import jrpc.server.annotation.RPCService;
 import jrpc.server.dispatcher.Dispatcher;
+import jrpc.server.provider.RPCProvider;
 import jrpc.utils.ClassUtil;
 
 /*
@@ -53,7 +55,12 @@ public class RPCApplication {
     	//加载所有service类
     	loadAllService("jrpc");
     	
-    	//监听服务
-    	
+    	//监听并对外提供服务
+    	try {
+			RPCProvider.provide();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}//
     }
 }
