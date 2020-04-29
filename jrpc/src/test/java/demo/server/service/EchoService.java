@@ -73,6 +73,12 @@ class Student{
 public class EchoService {
     @RPCMapping(mapping = "echo")
     public Result echoAnything(int age, String name) {
+    	try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     	return new Result(200, "OK", new Student(age, name));
     }
     

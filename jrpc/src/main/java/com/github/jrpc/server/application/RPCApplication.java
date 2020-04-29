@@ -51,7 +51,7 @@ public class RPCApplication {
 		Props.put("rpc.server.encoding",starter.encoding());
 		
 		String classpath = clazz.getResource("/").getPath().toString();
-		String propertiesPath = new File(classpath, "rpc.properties").toString();
+		String propertiesPath = new File(classpath, "rpc-server.properties").toString();
 		try {
 			Props.loadProperties(propertiesPath);
 		} catch (IOException e) {

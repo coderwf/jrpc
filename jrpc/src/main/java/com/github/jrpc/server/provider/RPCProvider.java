@@ -38,7 +38,6 @@ public class RPCProvider {
         // 绑定到9999端口
         
         socketChannel.bind(new InetSocketAddress(Integer.parseInt(Props.get("rpc.server.port"))));
-        System.out.println(Props.get("rpc.server.port"));
         Selector selector = Selector.open();
         
         // 为服务器注册接收事件
@@ -59,11 +58,12 @@ public class RPCProvider {
                     newSocketChannel.configureBlocking(false);
                     // 为客户端连接添注册读写事件
                     newSocketChannel.register(selector, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
-                } else if (key.isReadable()) {
-                    // 如果读到客户端的数据
-                    SocketChannel clientSocket = (SocketChannel) key.channel();
-                    //读取数据
                     
+                } else if (key.isReadable()) {
+                    // 客户端可读
+                    SocketChannel clientSocket = (SocketChannel) key.channel();
+                    
+                    //读取数据
                     RPCRequest request = null;
                     
                     try {
