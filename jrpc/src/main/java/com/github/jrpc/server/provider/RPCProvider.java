@@ -13,26 +13,32 @@ import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 
 import com.github.jrpc.core.bean.BeanFactory;
+import com.github.jrpc.core.props.Props;
 import com.github.jrpc.core.utils.JsonUtil;
-import com.github.jrpc.server.beans.HandlerInfo;
 import com.github.jrpc.server.beans.RPCRequest;
 import com.github.jrpc.server.beans.RPCResponse;
 import com.github.jrpc.server.dispatcher.Dispatcher;
+import com.github.jrpc.server.dispatcher.Handler;
 
 
 
 public class RPCProvider {
 	
+	private static String encoding = "utf-8";
+	
 	//java NIO
 	
     public static void provide() throws IOException {
+    	encoding = Props.get("rpc.server.encoding");
+    	
     	ServerSocketChannel socketChannel = ServerSocketChannel.open();
     	
         // 设置socket为非阻塞状态
         socketChannel.configureBlocking(false);
         // 绑定到9999端口
         
-        socketChannel.bind(new InetSocketAddress(9999));
+        socketChannel.bind(new InetSocketAddress(Integer.parseInt(Props.get("rpc.server.port"))));
+        System.out.println(Props.get("rpc.server.port"));
         Selector selector = Selector.open();
         
         // 为服务器注册接收事件
@@ -85,11 +91,12 @@ public class RPCProvider {
     private static void writeResponse(SocketChannel socket, RPCResponse response) throws IOException {
     	String responseJson = JsonUtil.objectToJson(response);
     	//todo null
-    	ByteBuffer buffer = ByteBuffer.wrap(responseJson.getBytes("utf-8"));
+    	ByteBuffer buffer = ByteBuffer.wrap(responseJson.getBytes(encoding));
     	
     	int n,  writeLen = buffer.limit();
     	
     	while(writeLen > 0) {
+    		
     		n = socket.write(buffer);
     		
     		if(n == 0)
@@ -108,7 +115,7 @@ public class RPCProvider {
     	byte[] msgBytes = readMsg(socket, buffer, msgLen);
     	
     	//解码
-    	String msg = new String(msgBytes, "utf-8");
+    	String msg = new String(msgBytes, encoding);
     	    	
     	RPCRequest request = JsonUtil.jsonToPojo(msg, RPCRequest.class);
     	
@@ -172,16 +179,17 @@ public class RPCProvider {
     
     private static RPCResponse invoke(RPCRequest request) {
     	//
-    	HandlerInfo handlerInfo = Dispatcher.getSingletonDispatcher().getHandler(request.getService());
-    	if(handlerInfo == null)
+    	Handler handler = Dispatcher.getSingletonDispatcher().getHandler(request.getService());
+    	
+    	if(handler == null)
     	    return new RPCResponse(400, String.format("Can not find handler for %s", request.getService()));
     	
-    	Object handler = null;
+    	Object service = null;
     	
 		try {
-			handler = BeanFactory.getBean(handlerInfo.getObj());
-			if(handler == null)
-				return new RPCResponse(400, String.format("Can not find handler for %s", request.getService()));
+			service = BeanFactory.getBean(handler.getObj());
+			if(service == null)
+				return new RPCResponse(400, String.format("Can not find service for %s", request.getService()));
 			
 		} catch (InstantiationException | IllegalAccessException e) {
 			e.printStackTrace();
@@ -193,7 +201,7 @@ public class RPCProvider {
     		
 		//result = handlerInfo.getMethod().invoke(handler, request.getParameters());
 		try {
-			result = handlerInfo.invoke(handler, request.getData());
+			result = handler.invoke(service, request.getData());
 		} catch (IllegalAccessException | InvocationTargetException | RuntimeException e ) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

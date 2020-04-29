@@ -15,4 +15,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RPCServerStarter {
     String name() default ""; //服务名
+    
+    String port() default "7000"; //端口
+    
+    String encoding() default "utf-8";//数据传输编码方式
+    
 }

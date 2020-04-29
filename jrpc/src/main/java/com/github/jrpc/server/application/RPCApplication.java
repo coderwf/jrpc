@@ -1,7 +1,10 @@
 package com.github.jrpc.server.application;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
+import com.github.jrpc.core.props.Props;
 import com.github.jrpc.core.utils.ClassUtil;
 import com.github.jrpc.server.annotation.RPCServerStarter;
 import com.github.jrpc.server.annotation.RPCService;
@@ -18,7 +21,7 @@ public class RPCApplication {
 	
 	private static Dispatcher dispatcher = Dispatcher.getSingletonDispatcher();
 	
-	private static void checkIsRPCStarterClass(Class<?> clazz) {
+	private static RPCServerStarter checkIsRPCStarterClass(Class<?> clazz) {
 		
 		//获取RPCServerStarter注解
 		RPCServerStarter starter = clazz.getAnnotation(RPCServerStarter.class);
@@ -30,6 +33,7 @@ public class RPCApplication {
     		serverName = starter.name();
     	else 
     		serverName = clazz.getName();
+    	return starter;
 	}
 	
 	private static void loadAllService(String packageName) {
@@ -42,9 +46,26 @@ public class RPCApplication {
 		//
 	}
 	
+	private static void loadProperties(Class<?> clazz, RPCServerStarter starter) {
+		Props.put("rpc.server.port", starter.port());
+		Props.put("rpc.server.encoding",starter.encoding());
+		
+		String classpath = clazz.getResource("/").getPath().toString();
+		String propertiesPath = new File(classpath, "rpc.properties").toString();
+		try {
+			Props.loadProperties(propertiesPath);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
     public static void run(Class<?> clazz, String []args) {
     	//检查该类是否为启动类
-    	checkIsRPCStarterClass(clazz);
+    	RPCServerStarter starter = checkIsRPCStarterClass(clazz);
+    	
+    	//加载properties属性
+    	loadProperties(clazz, starter);
     	
     	//加载启动类所在包以及其子包内所有service
     	loadAllService(clazz.getPackage().getName());

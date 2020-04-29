@@ -1,17 +1,17 @@
-package com.github.jrpc.server.beans;
+package com.github.jrpc.server.dispatcher;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Map;
 
-public class HandlerInfo {
+public class Handler {
     private String obj;
     private Method method;
     
     private String[] params;
     
-    public HandlerInfo() {};
+    public Handler() {};
     
     private void parseMethodParams(Method method) {
     	Parameter []parameters = method.getParameters();
@@ -20,7 +20,7 @@ public class HandlerInfo {
     		params[i] = parameters[i].getName();
     }
     
-    public HandlerInfo(String obj, Method method) {
+    public Handler(String obj, Method method) {
     	this.obj = obj;
     	this.method = method;
     	this.parseMethodParams(this.method);

@@ -6,14 +6,13 @@ import java.util.HashMap;
 import com.github.jrpc.core.bean.BeanFactory;
 import com.github.jrpc.server.annotation.RPCMapping;
 import com.github.jrpc.server.annotation.RPCService;
-import com.github.jrpc.server.beans.HandlerInfo;
 
 
 
 public class Dispatcher {
     private static Dispatcher dispatcher = new Dispatcher();
     
-    private HashMap<String, HandlerInfo> mappings = new HashMap<String, HandlerInfo>(200);
+    private HashMap<String, Handler> mappings = new HashMap<String, Handler>(200);
     
     private Dispatcher() {};
     
@@ -48,7 +47,7 @@ public class Dispatcher {
     		else
     			mappingName = rpcMapping.mapping();
     		
-    		mappings.put(String.format("%s.%s", serviceName, mappingName), new HandlerInfo(clazz.getSimpleName(), method));
+    		mappings.put(String.format("%s.%s", serviceName, mappingName), new Handler(clazz.getSimpleName(), method));
     		
     	}//for
     	
@@ -60,7 +59,7 @@ public class Dispatcher {
     	
     }//addMapping
     
-    public HandlerInfo getHandler(String serviceName) {
+    public Handler getHandler(String serviceName) {
     	return mappings.get(serviceName);
     }
     
