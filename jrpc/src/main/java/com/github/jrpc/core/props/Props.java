@@ -29,6 +29,5 @@ public class Props {
             if(null != inputStream)
             inputStream.close();     
         }//finally
-    }//
-    
+    }//   
 }

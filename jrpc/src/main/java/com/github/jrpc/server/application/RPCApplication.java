@@ -49,6 +49,7 @@ public class RPCApplication {
 	private static void loadProperties(Class<?> clazz, RPCServerStarter starter) {
 		Props.put("rpc.server.port", starter.port());
 		Props.put("rpc.server.encoding",starter.encoding());
+		Props.put("rpc.server.buffersize", "1024");
 		
 		String classpath = clazz.getResource("/").getPath().toString();
 		String propertiesPath = new File(classpath, "rpc-server.properties").toString();
@@ -77,6 +78,7 @@ public class RPCApplication {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}//
+    	
     }
 }
 
