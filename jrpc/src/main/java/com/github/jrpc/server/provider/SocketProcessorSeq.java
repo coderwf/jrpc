@@ -65,7 +65,8 @@ public class SocketProcessorSeq implements SocketProcessor{
         }catch (Exception e) {
 			close(socket);
 			return ;
-		}    
+		}
+        
 	}//handlerSocket
 	
     

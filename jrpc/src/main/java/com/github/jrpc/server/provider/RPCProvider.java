@@ -48,13 +48,14 @@ public class RPCProvider {
         // 为服务器注册接收事件
         socketChannel.register(selector, SelectionKey.OP_ACCEPT);
         
-        // SocketProcessor processor = new SocketProcessorSeq(ByteBuffer.allocateDirect(bufferSize), new byte[1024], encoding);
+       // SocketProcessor processor = new SocketProcessorSeq(ByteBuffer.allocateDirect(bufferSize), new byte[1024], encoding);
         
         SocketProcessor processor = new SocketProcessorExecutor(10, 1024, bufferSize, 1024, encoding);
 
+        int n = 1;
         
         while (true) {
-            if (selector.select(100) <= 0) 
+            if (selector.select(1) <= 0) 
             	continue;
             
             Iterator<SelectionKey> iterable = selector.selectedKeys().iterator();
@@ -62,29 +63,38 @@ public class RPCProvider {
             while (iterable.hasNext()) {
             	
                 SelectionKey key = iterable.next();
+                iterable.remove();
+                
                 try {
                 	 if (key.isAcceptable()) {
                          // 如果accept被激活，说明有客户端连接
                          SocketChannel newSocketChannel = socketChannel.accept();
                          newSocketChannel.configureBlocking(false);
                          // 为客户端连接添注册读写事件
-                         newSocketChannel.register(selector, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
+                          newSocketChannel.register(selector, SelectionKey.OP_READ);
+                         
+//                         System.out.println("accept");
+//                         System.out.println(key.interestOps());
                          
                      } else if (key.isReadable()) {
-                    	 
+                    	 System.out.println("read ");
                          // 客户端可读
                          SocketChannel client = (SocketChannel) key.channel();
+  						 //key.channel().register(key.selector(), SelectionKey.OP_WRITE);
+  						 //key.interestOps(~SelectionKey.OP_READ & key.interestOps())
                          processor.handlerSocket(client);
-     					
+                        
                          
                      } else if(key.isWritable()) {
+                    	 
                      	//写数据
+                    	 // System.out.println("write ");
                      }//
                 }catch (CancelledKeyException e) {
 					key.cancel();
 				}//
                 
-                iterable.remove();
+                
             }//while
             
         }//while(true)
